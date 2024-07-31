@@ -40,7 +40,7 @@ public class UserController {
             User user = userDataAccessService.register(username, password);
 
             SessionManager.setUser(request, user);
-            logger.info("{} registered", username);
+            logger.info("{} registered", user.id());
 
             response.sendRedirect("/");
         } catch (Exception e) {

@@ -17,12 +17,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PostgresUserDataAccessService implements UserDataAccessService {
 
     private final JdbcTemplate jdbcTemplate;
-    private final Logger logger;
 
     @Autowired
     public PostgresUserDataAccessService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.logger = LoggerFactory.getLogger(PostgresUserDataAccessService.class);
     }
 
     @Override
@@ -34,7 +32,7 @@ public class PostgresUserDataAccessService implements UserDataAccessService {
                 BCrypt.hashpw(password, BCrypt.gensalt())
         );
 
-        logger.info("Created user {}: {}", username, result);
+        if (result != 1) throw new EntityExistsException();
 
         try {
             return login(username, password);

@@ -3,10 +3,85 @@
 <head>
     <title>My Calendar - Calendar</title>
     <link rel="stylesheet" href="css/index.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .calendar {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            border: 1px solid #ccc;
+        }
+
+        .day-column {
+            flex: 1;
+            border-right: 1px solid #ccc;
+            position: relative;
+        }
+
+        .day-column:last-child {
+            border-right: none;
+        }
+
+        .day-label {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .day-of-week {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .day-date {
+            text-align: center;
+        }
+
+        .day-today {
+            text-align: center;
+            font-style: italic;
+        }
+
+        .event {
+            position: absolute;
+            width: 90%;
+            left: 5%;
+            background-color: #ffcc00;
+            border: 1px solid #ffa500;
+            border-radius: 4px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <form action="/api/v1/user/logout" method="POST" >
         <button type="submit">Logout</button>
     </form>
+    <form action="/api/v1/event/new" method="POST" >
+        Title: <input type="text" name="title" required><br>
+        Description: <input type="text" name="description"><br>
+        Start Time: <input type="datetime-local" name="start_time" required><br>
+        End Time: <input type="datetime-local" name="end_time"><br>
+        <button type="submit">Create Event</button>
+    </form>
+    <div class="calendar">
+        {{#days}}
+        <div class="day-column" id="day-{{i}}">
+            <div class="day-label">
+                <div class="day-of-week">{{dayOfWeek}}</div>
+                <div class="day-date">{{dayDate}}</div>
+            </div>
+            {{#events}}
+            <div class="event" id="event-{{id}}" style="top: {{top}}%; height: {{height}}%;">{{title}}</div>
+            {{/events}}
+        </div>
+        {{/days}}
+    </div>
 </body>
 </html>

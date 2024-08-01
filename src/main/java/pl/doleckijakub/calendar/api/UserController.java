@@ -11,10 +11,8 @@ import pl.doleckijakub.calendar.dataaccess.UserDataAccessService;
 import pl.doleckijakub.calendar.manager.SessionManager;
 import pl.doleckijakub.calendar.model.User;
 
-import javax.naming.AuthenticationException;
-import javax.persistence.EntityExistsException;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/user")
@@ -26,12 +24,12 @@ public class UserController {
     @Autowired
     public UserController(@Qualifier("postgresUserAS") UserDataAccessService userDataAccessService) {
         this.userDataAccessService = userDataAccessService;
-        this.logger = LoggerFactory.getLogger(UserDataAccessService.class);
+        this.logger = LoggerFactory.getLogger(getClass());
     }
 
     @GetMapping("/me")
-    public UUID me(HttpServletRequest request) {
-        return (UUID) request.getSession().getAttribute("user_id");
+    public Optional<User> me(HttpServletRequest request) {
+        return SessionManager.getUser(request);
     }
 
     @PostMapping("/register")

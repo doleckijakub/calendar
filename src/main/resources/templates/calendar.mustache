@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Calendar - Calendar</title>
     <link rel="stylesheet" href="css/index.css">
     <style>
@@ -8,19 +10,24 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .calendar {
             display: flex;
-            height: 100vh;
+            height: 100%;
             width: 100%;
             border: 1px solid #ccc;
+            overflow: hidden;
         }
 
         .day-column {
             flex: 1;
             border-right: 1px solid #ccc;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .day-column:last-child {
@@ -28,23 +35,18 @@
         }
 
         .day-label {
+            text-align: center;
+            font-weight: bold;
             padding: 10px;
             background-color: #f5f5f5;
             border-bottom: 1px solid #ccc;
+            flex: 0 0 auto;
         }
 
-        .day-of-week {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .day-date {
-            text-align: center;
-        }
-
-        .day-today {
-            text-align: center;
-            font-style: italic;
+        .day-events {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
         }
 
         .event {
@@ -52,15 +54,27 @@
             width: 90%;
             left: 5%;
             background-color: #ffcc00;
-            border: 1px solid #ffa500;
-            border-radius: 4px;
+            border-left: 2px solid #ffa500;
+            border-right: 2px solid #ffa500;
             padding: 5px;
             box-sizing: border-box;
+        }
+
+        .event-started-today {
+            border-top: 1px solid #ffa500;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .event-ended-today {
+            border-bottom: 3px solid #ffa500;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
         }
     </style>
 </head>
 <body>
-    <form action="/api/v1/user/logout" method="POST" >
+    <!-- <form action="/api/v1/user/logout" method="POST" >
         <button type="submit">Logout</button>
     </form>
     <form action="/api/v1/event/new" method="POST" >
@@ -69,17 +83,21 @@
         Start Time: <input type="datetime-local" name="start_time" required><br>
         End Time: <input type="datetime-local" name="end_time"><br>
         <button type="submit">Create Event</button>
-    </form>
+    </form> --!>
     <div class="calendar">
         {{#days}}
-        <div class="day-column" id="day-{{i}}">
+        <div class="day-column">
             <div class="day-label">
                 <div class="day-of-week">{{dayOfWeek}}</div>
                 <div class="day-date">{{dayDate}}</div>
             </div>
-            {{#events}}
-            <div class="event" id="event-{{id}}" style="top: {{top}}%; height: {{height}}%;">{{title}}</div>
-            {{/events}}
+            <div class="day-events">
+                {{#events}}
+                <div class="event{{#startedToday}} event-started-today{{/startedToday}}{{#endedToday}} event-ended-today{{/endedToday}}" id="event-{{id}}" style="top: {{top}}%; height: {{height}}%;">
+                    {{title}}
+                </div>
+                {{/events}}
+            </div>
         </div>
         {{/days}}
     </div>

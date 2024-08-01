@@ -2,7 +2,6 @@ package pl.doleckijakub.calendar.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -55,6 +54,15 @@ public class FrontendController {
         return "register";
     }
 
+    /*
+     * Returns the percentage of days between a start of date and a given datetime
+     *
+     * Result can be negative
+     */
+    private double dayPercentageBetween(LocalDate date, LocalDateTime dateTime) {
+        return Duration.between(date.atStartOfDay(), dateTime).toMinutes() / 24.0 / 60.0 * 100.0;
+    }
+
     @GetMapping("/calendar")
     public String calendar(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
         if (SessionManager.getUser(request).isEmpty()) {
@@ -64,8 +72,13 @@ public class FrontendController {
 
         User user = SessionManager.getUser(request).get();
 
-        List<Map<String, Object>> days = new ArrayList<>(DAYS_TO_SHOW);
-        for (int i = 0; i < DAYS_TO_SHOW; i++) {
+        int daysToShow = DAYS_TO_SHOW;
+        try {
+            daysToShow = Integer.parseInt(request.getParameter("n"));
+        } catch (Exception ignored) {}
+
+        List<Map<String, Object>> days = new ArrayList<>(daysToShow);
+        for (int i = 0; i < daysToShow; i++) {
             LocalDate date = LocalDate.now().plusDays(i);
 
             Map<String, Object> day = new HashMap<>();
@@ -73,18 +86,25 @@ public class FrontendController {
             {
                 List<Event> events = eventDataAccessService.getAllOfUserOnDay(user, date);
                 for (Event event : events) {
-                    LoggerFactory.getLogger(getClass()).info("on {} {}", date, event);
-
                     Map<String, Object> eventObject = new LinkedHashMap<>();
 
-                    LocalDateTime start = event.start_time().toLocalDateTime();
-                    long startOfDayMinutes = start.getHour() * 60 + start.getMinute();
-                    double top = (startOfDayMinutes / 1440.0) * 100 /* % */;
+                    double start = dayPercentageBetween(date, event.start_time().toLocalDateTime());
+                    double end = dayPercentageBetween(date, event.end_time().toLocalDateTime());
 
-                    LocalDateTime end = event.end_time().toLocalDateTime();
-                    Duration duration = Duration.between(start, end);
-                    long durationMinutes = duration.toMinutes();
-                    double height = (durationMinutes / 1440.0) * 100 /* % */;
+                    if (start < 0.0) {
+                        start = 0.0;
+                    } else {
+                        eventObject.put("startedToday", true);
+                    }
+
+                    if (end > 100.0) {
+                        end = 100.0;
+                    } else {
+                        eventObject.put("endedToday", true);
+                    }
+
+                    double top = start;
+                    double height = end - start;
 
                     eventObject.put("id", event.id());
                     eventObject.put("title", event.title());
@@ -95,7 +115,7 @@ public class FrontendController {
                     eventObjects.add(eventObject);
                 }
             }
-            day.put("i", i);
+
             day.put("dayOfWeek", date.getDayOfWeek().toString());
             day.put("dayDate", date.toString());
             day.put("events", eventObjects);

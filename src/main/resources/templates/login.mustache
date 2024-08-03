@@ -5,21 +5,19 @@
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <h2>Login</h2>
-    <form action="/api/v1/user/login" method="POST" >
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+    <div id="window-background" class="window-background">
+        <div id="login-window" class="window">
+            <h2>Login</h2>
+            <form action="/api/v1/user/login" method="POST" >
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <input type="submit" value="Login">
+            </form>
+            {{#error}}<span class="error">{{error}}</span><br/>{{/error}}
+            <span>Don't have an account, <a href="/register">register here</a>.</span>
         </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div>
-            <button type="submit">Login</button>
-        </div>
-    </form>
-    {{#error}}<span class="error">{{error}}</span><br/>{{/error}}
-    <span>Don't have an account, <a href="/register">register here</a>.</span>
+    </div>
 </body>
 </html>

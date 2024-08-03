@@ -1,19 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Calendar - Calendar</title>
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
-        }
-
         .calendar {
             display: flex;
             height: 100%;
@@ -50,13 +43,15 @@
         }
 
         .event {
+            font-size: 12px;
+            font-weight: bold;
             position: absolute;
             width: 90%;
             left: 5%;
             background-color: #ffcc00;
             border-left: 2px solid #ffa500;
             border-right: 2px solid #ffa500;
-            padding: 5px;
+            padding: 2px;
             box-sizing: border-box;
         }
 
@@ -71,19 +66,70 @@
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
         }
+
+        .toggle-tools, .menu-item {
+            width: 32px;
+            height: 32px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .toggle-tools {
+            position: fixed;
+            bottom: 8px;
+            right: 8px;
+            font-size: 24px;
+
+            flex-direction: row;
+            padding: 0;
+        }
+
+        .menu {
+            position: fixed;
+            bottom: 48px;
+            right: 8px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .menu-item {
+            font-size: 24px;
+            margin-top: 8px;
+            transform: translateY(300%);
+            opacity: 0;
+            transition: transform 0.3s linear, opacity 0.3s linear;
+        }
+
+        .menu-item.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .close-btn::after {
+            content: "\00d7";
+        }
     </style>
 </head>
 <body>
-    <!-- <form action="/api/v1/user/logout" method="POST" >
-        <button type="submit">Logout</button>
-    </form>
-    <form action="/api/v1/event/new" method="POST" >
-        Title: <input type="text" name="title" required><br>
-        Description: <input type="text" name="description"><br>
-        Start Time: <input type="datetime-local" name="start_time" required><br>
-        End Time: <input type="datetime-local" name="end_time"><br>
-        <button type="submit">Create Event</button>
-    </form> --!>
     <div class="calendar">
         {{#days}}
         <div class="day-column">
@@ -101,5 +147,90 @@
         </div>
         {{/days}}
     </div>
+    <button id="toggle-tools" class="toggle-tools">
+        <i class="fa-solid fa-ellipsis"></i>
+    </button>
+    <div id="menu" class="menu">
+        <!--new event-->
+        <button class="menu-item" id="new-event-btn">
+            +
+        </button>
+        <!--logout-->
+        <form action="/api/v1/user/logout" method="POST" >
+            <button class="menu-item" id="sign-out-btn" type="submit">
+                <i class="fa fa-sign-out" aria-hidden="true"></i>
+            </button>
+        </form>
+    </div>
+    <div id="window-background" class="window-background" style="display: none;">
+        <div id="new-event-window" class="window">
+            <button class="close-btn"></button>
+            <h2>New Event</h2>
+            <form action="/api/v1/event/new" method="POST" >
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" required><br>
+                <label for="description">Description:</label>
+                <input type="text" name="description" id="description"><br>
+                <label for="start_time">Start Time:</label>
+                <input type="datetime-local" name="start_time" id="start_time" required><br>
+                <label for="end_time">End Time:</label>
+                <input type="datetime-local" name="end_time" id="end_time"><br>
+                <input type="submit" value="Create Event" />
+            </form>
+        </div>
+    </div>
+    <script defer>
+        const toggleToolsButton = document.getElementById('toggle-tools');
+        const windowBackground = document.getElementById('window-background');
+
+        const newEventButton = document.getElementById('new-event-btn');
+        const newEventWindow = document.getElementById('new-event-window');
+
+        const menu = document.getElementById('menu');
+        const menuItems = menu.getElementsByClassName('menu-item');
+
+        function showMenu() {
+            menu.style.display = 'flex';
+            setTimeout(function() {
+                for (let i = 0; i < menuItems.length; i++) {
+                    setTimeout(function() {
+                        menuItems[i].classList.add('show');
+                    }, i * 100);
+                }
+            }, 10);
+        }
+
+        function hideMenu() {
+            for (let i = menuItems.length - 1; i >= 0; i--) {
+                setTimeout(function() {
+                    menuItems[i].classList.remove('show');
+                    if (i === 0) {
+                        setTimeout(function() {
+                            menu.style.display = 'none';
+                        }, 300);
+                    }
+                }, (menuItems.length - 1 - i) * 100);
+            }
+        }
+
+        toggleToolsButton.addEventListener('click', function() {
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                showMenu();
+            } else {
+                hideMenu();
+            }
+        });
+
+        newEventButton.addEventListener('click', function() {
+            hideMenu();
+            windowBackground.style.display = 'block';
+            newEventWindow.style.display = 'block';
+        });
+
+        newEventWindow.getElementsByClassName('close-btn')[0].addEventListener('click', function() {
+            windowBackground.style.display = 'none';
+            newEventWindow.style.display = 'none';
+        });
+    </script>
 </body>
 </html>

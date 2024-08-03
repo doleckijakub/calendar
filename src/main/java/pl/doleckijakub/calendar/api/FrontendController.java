@@ -89,7 +89,7 @@ public class FrontendController {
                     Map<String, Object> eventObject = new LinkedHashMap<>();
 
                     double start = dayPercentageBetween(date, event.start_time().toLocalDateTime());
-                    double end = dayPercentageBetween(date, event.end_time().toLocalDateTime());
+                    double end = event.end_time() == null ? start + 100.0 / 24.0 : dayPercentageBetween(date, event.end_time().toLocalDateTime());
 
                     if (start < 0.0) {
                         start = 0.0;

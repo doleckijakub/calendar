@@ -14,6 +14,7 @@ import pl.doleckijakub.calendar.model.Event;
 import pl.doleckijakub.calendar.model.User;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,6 +64,18 @@ public class FrontendController {
         return Duration.between(date.atStartOfDay(), dateTime).toMinutes() / 24.0 / 60.0 * 100.0;
     }
 
+    private int numEventsAtTime(List<Event> events, Timestamp timestamp) {
+        int result = 0;
+
+        for (Event event : events) {
+            if (event.start_time().before(timestamp) && (event.end_time().equals(timestamp) || event.end_time().after(timestamp))) {
+                result += 1;
+            }
+        }
+
+        return result;
+    }
+
     @GetMapping("/calendar")
     public String calendar(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
         if (SessionManager.getUser(request).isEmpty()) {
@@ -85,6 +98,29 @@ public class FrontendController {
             List<Map<String, Object>> eventObjects = new ArrayList<>();
             {
                 List<Event> events = eventDataAccessService.getAllOfUserOnDay(user, date);
+
+                Set<Timestamp> uniqueTimestamps = new HashSet<>();
+                for (Event event : events) {
+                    uniqueTimestamps.add(event.start_time());
+                    uniqueTimestamps.add(event.end_time());
+                }
+
+                int maxEventsAtATime = 0;
+                Map<Timestamp, Integer> numEventsAtATime = new HashMap<>();
+                for (Timestamp timestamp : uniqueTimestamps) {
+                    int c = 0;
+                    
+                    for (Event event : events) {
+                        if (event.start_time().before(timestamp) && (event.end_time().after(timestamp) || event.end_time().equals(timestamp))) { // start_time < timestamp <= end_time
+                            c++;
+
+                            if (c > maxEventsAtATime) maxEventsAtATime = c;
+                        }
+                    }
+
+                    numEventsAtATime.put(timestamp, c);
+                }
+
                 for (Event event : events) {
                     Map<String, Object> eventObject = new LinkedHashMap<>();
 
@@ -103,13 +139,19 @@ public class FrontendController {
                         eventObject.put("endedToday", true);
                     }
 
+                    int index = Math.min(numEventsAtATime.get(event.start_time()), numEventsAtATime.get(event.end_time()));
+
+                    double left = 100.0 * index / maxEventsAtATime;
                     double top = start;
+                    double width = 100.0 / maxEventsAtATime;
                     double height = end - start;
 
                     eventObject.put("id", event.id());
                     eventObject.put("title", event.title());
                     eventObject.put("description", event.description());
+                    eventObject.put("left", left);
                     eventObject.put("top", top);
+                    eventObject.put("width", width);
                     eventObject.put("height", height);
 
                     eventObjects.add(eventObject);

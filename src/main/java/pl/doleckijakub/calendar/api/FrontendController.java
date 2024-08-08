@@ -113,10 +113,10 @@ public class FrontendController {
                     for (Event event : events) {
                         if (event.start_time().before(timestamp) && (event.end_time().after(timestamp) || event.end_time().equals(timestamp))) { // start_time < timestamp <= end_time
                             c++;
-
-                            if (c > maxEventsAtATime) maxEventsAtATime = c;
                         }
                     }
+
+                    if (c > maxEventsAtATime) maxEventsAtATime = c;
 
                     numEventsAtATime.put(timestamp, c);
                 }

@@ -43,6 +43,7 @@ public class UserController {
             response.sendRedirect("/");
         } catch (Exception e) {
             response.sendRedirect("/register?error");
+            logger.error(e.getMessage());
         }
     }
 
@@ -57,6 +58,7 @@ public class UserController {
             response.sendRedirect("/");
         } catch (Exception e) {
             response.sendRedirect("/login?error");
+            logger.error(e.getMessage());
         }
     }
 

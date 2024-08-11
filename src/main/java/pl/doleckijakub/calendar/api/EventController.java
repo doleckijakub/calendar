@@ -44,7 +44,8 @@ public class EventController {
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("start_time") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start_time_ldt,
-            @RequestParam("end_time") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end_time_ldt
+            @RequestParam("end_time") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end_time_ldt,
+            @RequestParam("color") String color
     ) throws IOException {
         if (SessionManager.getUser(request).isEmpty()) {
             response.sendRedirect("/login");
@@ -56,7 +57,7 @@ public class EventController {
         Timestamp start_time = Timestamp.valueOf(start_time_ldt);
         Timestamp end_time = Timestamp.valueOf(end_time_ldt);
 
-        Event event = eventDataAccessService.create(title, description, start_time, end_time, user.id());
+        Event event = eventDataAccessService.create(title, description, start_time, end_time, user.id(), color);
 
         logger.info("{} created event {}", user.id(), event.id());
 

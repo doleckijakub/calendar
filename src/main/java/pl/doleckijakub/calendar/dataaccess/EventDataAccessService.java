@@ -14,5 +14,5 @@ public interface EventDataAccessService {
     List<Event> getAllOfUserOnDay(User user, LocalDate date);
     Event getById(UUID eventId);
 
-    Event create(String title, String description, Timestamp startTime, Timestamp endTime, UUID authorId);
+    Event create(String title, String description, Timestamp startTime, Timestamp endTime, UUID authorId, String color);
 }

@@ -30,41 +30,44 @@ public class PostgresEventDataAccessService implements EventDataAccessService {
                 resultSet.getString("description"),
                 resultSet.getTimestamp("start_time"),
                 resultSet.getTimestamp("end_time"),
-                UUID.fromString(resultSet.getString("author_id"))
+                UUID.fromString(resultSet.getString("author_id")),
+                resultSet.getString("color")
         ));
     }
 
     @Override
     public List<Event> getAllOfUserOnDay(User user, LocalDate date) {
-        final String sql = "SELECT id, title, description, start_time, end_time, author_id FROM event WHERE author_id = ? AND DATE(?) BETWEEN DATE(start_time) AND DATE(end_time)";
+        final String sql = "SELECT id, title, description, start_time, end_time, author_id, color FROM event WHERE author_id = ? AND DATE(?) BETWEEN DATE(start_time) AND DATE(end_time)";
         return jdbcTemplate.query(sql, (resultSet, i) -> new Event(
                 UUID.fromString(resultSet.getString("id")),
                 resultSet.getString("title"),
                 resultSet.getString("description"),
                 resultSet.getTimestamp("start_time"),
                 resultSet.getTimestamp("end_time"),
-                UUID.fromString(resultSet.getString("author_id"))
+                UUID.fromString(resultSet.getString("author_id")),
+                resultSet.getString("color")
         ), user.id(), date);
     }
 
     @Override
     public Event getById(UUID eventId) {
-        final String sql = "SELECT id, title, description, start_time, end_time, author_id FROM event WHERE id = ?";
+        final String sql = "SELECT id, title, description, start_time, end_time, author_id, color FROM event WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, (resultSet, i) -> new Event(
                 UUID.fromString(resultSet.getString("id")),
                 resultSet.getString("title"),
                 resultSet.getString("description"),
                 resultSet.getTimestamp("start_time"),
                 resultSet.getTimestamp("end_time"),
-                UUID.fromString(resultSet.getString("author_id"))
+                UUID.fromString(resultSet.getString("author_id")),
+                resultSet.getString("color")
         ), eventId);
     }
 
     @Override
-    public Event create(String title, String description, Timestamp startTime, Timestamp endTime, UUID authorId) {
+    public Event create(String title, String description, Timestamp startTime, Timestamp endTime, UUID authorId, String color) {
         UUID id = UUID.randomUUID();
 
-        final String sql = "INSERT INTO \"event\" (id, title, description, start_time, end_time, author_id) VALUES (?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO \"event\" (id, title, description, start_time, end_time, author_id, color) VALUES (?, ?, ?, ?, ?, ?, ?)";
         int result = jdbcTemplate.update(
                 sql,
                 id,
@@ -72,7 +75,8 @@ public class PostgresEventDataAccessService implements EventDataAccessService {
                 description,
                 startTime,
                 endTime,
-                authorId
+                authorId,
+                color
         );
 
         if (result != 1) throw new RuntimeException();

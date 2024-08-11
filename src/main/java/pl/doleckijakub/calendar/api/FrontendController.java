@@ -13,12 +13,14 @@ import pl.doleckijakub.calendar.manager.SessionManager;
 import pl.doleckijakub.calendar.model.Event;
 import pl.doleckijakub.calendar.model.User;
 
+import java.awt.*;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -149,6 +151,9 @@ public class FrontendController {
                     eventObject.put("id", event.id());
                     eventObject.put("title", event.title());
                     eventObject.put("description", event.description());
+                    eventObject.put("color", event.color());
+                    eventObject.put("borderColor", hexColorMultiply(event.color(), 0.5f));
+
                     eventObject.put("left", left);
                     eventObject.put("top", top);
                     eventObject.put("width", width);
@@ -167,6 +172,16 @@ public class FrontendController {
 
         model.addAttribute("days", days);
         return "calendar";
+    }
+
+    private String hexColorMultiply(String hexColor, float v) {
+        Color color = Color.decode(hexColor);
+
+        int r = (int)(color.getRed() * v);
+        int g = (int)(color.getGreen() * v);
+        int b = (int)(color.getBlue() * v);
+
+        return String.format("#%02x%02x%02x", r, g, b);
     }
 
 }

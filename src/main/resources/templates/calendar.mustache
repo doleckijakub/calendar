@@ -43,26 +43,25 @@
         }
 
         .event {
-            font-size: 12px;
+            font-size: 15px;
             font-weight: bold;
             position: absolute;
-            /* width: 90%; */
-            /* left: 5%; */
-            background-color: #ffcc00;
-            border-left: 2px solid #ffa500;
-            border-right: 2px solid #ffa500;
+            border-left: 2px solid;
+            border-right: 2px solid;
             padding: 2px;
             box-sizing: border-box;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            color: white;
         }
 
         .event-started-today {
-            border-top: 1px solid #ffa500;
+            border-top: 1px solid;
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
         }
 
         .event-ended-today {
-            border-bottom: 3px solid #ffa500;
+            border-bottom: 3px solid;
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
         }
@@ -139,7 +138,7 @@
             </div>
             <div class="day-events">
                 {{#events}}
-                <div class="event{{#startedToday}} event-started-today{{/startedToday}}{{#endedToday}} event-ended-today{{/endedToday}}" id="event-{{id}}" style="left: {{left}}%; top: {{top}}%; width: {{width}}%; height: {{height}}%;">
+                <div class="event{{#startedToday}} event-started-today{{/startedToday}}{{#endedToday}} event-ended-today{{/endedToday}}" id="event-{{id}}" style="left: {{left}}%; top: {{top}}%; width: {{width}}%; height: {{height}}%; background-color: {{color}}; border-color: {{borderColor}};">
                     {{title}}
                 </div>
                 {{/events}}
@@ -175,6 +174,8 @@
                 <input type="datetime-local" name="start_time" id="start_time" required><br>
                 <label for="end_time">End Time:</label>
                 <input type="datetime-local" name="end_time" id="end_time"><br>
+                <label for="color">Color:</label>
+                <input type="color" name="color" id="color" required><br>
                 <input type="submit" value="Create Event" />
             </form>
         </div>

@@ -48,7 +48,8 @@ form {
 
 input[type="text"],
 input[type="password"],
-input[type="datetime-local"] {
+input[type="datetime-local"],
+input[type="color"] {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -67,6 +68,17 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
     background-color: #0056b3;
+}
+
+input[type="color"] {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    width: initial;
+    height: 4rem;
 }
 
 form > label {

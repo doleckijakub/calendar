@@ -43,15 +43,40 @@
         }
 
         .event {
-            font-size: 15px;
-            font-weight: bold;
             position: absolute;
             border-left: 2px solid;
             border-right: 2px solid;
             padding: 2px;
             box-sizing: border-box;
+
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
             color: white;
+        }
+
+        .event-title {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .event-description {
+            font-size: 12px;
+        }
+
+        .event-start-time,
+        .event-end-time {
+            position: absolute;
+            right: 1rem;
+
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .event-start-time {
+            top: 0;
+        }
+
+        .event-end-time {
+            bottom: 0;
         }
 
         .event-started-today {
@@ -139,7 +164,14 @@
             <div class="day-events">
                 {{#events}}
                 <div class="event{{#startedToday}} event-started-today{{/startedToday}}{{#endedToday}} event-ended-today{{/endedToday}}" id="event-{{id}}" style="left: {{left}}%; top: {{top}}%; width: {{width}}%; height: {{height}}%; background-color: {{color}}; border-color: {{borderColor}};">
-                    {{title}}
+                    <div class="event-title">{{title}}</div>
+                    <div class="event-description">{{description}}</div>
+                    {{#startedToday}}
+                        <div class="event-start-time">{{startTime}}</div>
+                    {{/startedToday}}
+                    {{#endedToday}}
+                        <div class="event-end-time">{{endTime}}</div>
+                    {{/endedToday}}
                 </div>
                 {{/events}}
             </div>

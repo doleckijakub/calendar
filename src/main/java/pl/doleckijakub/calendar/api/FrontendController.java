@@ -16,6 +16,7 @@ import pl.doleckijakub.calendar.model.User;
 import java.awt.*;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -92,6 +93,8 @@ public class FrontendController {
             daysToShow = Integer.parseInt(request.getParameter("n"));
         } catch (Exception ignored) {}
 
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+
         List<Map<String, Object>> days = new ArrayList<>(daysToShow);
         for (int i = 0; i < daysToShow; i++) {
             LocalDate date = LocalDate.now().plusDays(i);
@@ -133,12 +136,14 @@ public class FrontendController {
                         start = 0.0;
                     } else {
                         eventObject.put("startedToday", true);
+                        eventObject.put("startTime", timeFormat.format(event.start_time()));
                     }
 
                     if (end > 100.0) {
                         end = 100.0;
                     } else {
                         eventObject.put("endedToday", true);
+                        eventObject.put("endTime", timeFormat.format(event.end_time()));
                     }
 
                     int index = Math.min(numEventsAtATime.get(event.start_time()), numEventsAtATime.get(event.end_time()));
